@@ -59,5 +59,4 @@ def monitor_packets(packet):
 
 if __name__ == "__main__":
     print("Starting DOS detection system on Windows...")
-    interface = get_if_list()
     sniff(filter="icmp", prn=monitor_packets, store=False, iface="Loopback Pseudo-Interface 1")

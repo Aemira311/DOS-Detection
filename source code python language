@@ -1,0 +1,63 @@
+from scapy.all import sniff, IP, ICMP
+import time
+from tkinter import messagebox, Tk, font
+from scapy.interfaces import get_if_list
+
+
+DOS_THRESHOLD = 5 # Numeber of packets
+LARGE_PACKET_SIZE = 1000 # Maximum packet size
+TIME_WINDOW = 20    # Time in seconds
+
+#lists for saved IP's
+packet_counts = {}
+large_packet_counts = {}
+first_seen_times = {}
+
+root = Tk()
+root.withdraw()
+
+def monitor_packets(packet):
+    if IP in packet:
+        src_ip = packet[IP].src
+        current_time = time.time()
+        print(f"Packet from {src_ip}, Length: {len(packet)} bytes")
+
+        if src_ip not in packet_counts:
+            packet_counts[src_ip] = 0
+            large_packet_counts[src_ip] = 0
+            first_seen_times[src_ip] = current_time
+
+        if current_time - first_seen_times[src_ip] > TIME_WINDOW:
+            packet_counts[src_ip] = 0
+            large_packet_counts[src_ip] = 0
+            first_seen_times[src_ip] = current_time
+
+        packet_counts[src_ip] += 1
+        if ICMP in packet and len(packet) > LARGE_PACKET_SIZE:
+            large_packet_counts[src_ip] += 1
+            messagebox.showwarning(
+
+                title="Large Packet Alert",
+                message=f"🚨 Large packet detected from {src_ip}.\n"
+                        f"Total large packets: {large_packet_counts[src_ip]}",
+            )
+
+        if packet_counts[src_ip] >= DOS_THRESHOLD:
+                messagebox.showerror(
+                title="DOS Attack Alert",
+                message=f"❗ Potential DOS attack detected from IP: {src_ip}\n"
+                        f"Packets: {packet_counts[src_ip]}",
+            )
+
+        if large_packet_counts[src_ip] >= DOS_THRESHOLD:
+                messagebox.showerror(
+                title="DOS Attack Alert",
+                message=f"⚠️ Large packet DOS attack from IP: {src_ip}\n"
+                        f"Large Packets: {large_packet_counts[src_ip]}",
+            )
+
+
+if __name__ == "__main__":
+    print("Starting DOS detection system on Windows...")
+    interface = get_if_list()
+    sniff(filter="icmp", prn=monitor_packets, store=False, iface="Loopback Pseudo-Interface 1")

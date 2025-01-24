@@ -74,9 +74,10 @@ DOS_THRESHOLD: Number of packets to trigger a DOS alert.
 LARGE_PACKET_SIZE: Packet size threshold for large packets.
 TIME_WINDOW: Time duration (in seconds) for traffic analysis.
 
+## Contribution
+Contributions are welcome! If you have ideas for enhancements or bug fixes, feel free to open an issue or submit a pull request.
 
 Contact
 For any questions or contributions, feel free to reach out:
-
 Email: abdelrahman.emira311@gmail.com
 LinkedIn: www.linkedin.com/in/abdelrahman-emira-48b187239
